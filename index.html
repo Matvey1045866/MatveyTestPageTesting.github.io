@@ -41,5 +41,16 @@
     </script>
 <img scr="https://github.com/Matvey1045866/MatveyTestPageTesting.github.io/blob/main/IMG_0457.jpeg">
 <h3>This Web-Page in beta!</h3>
+<button onclick="showInput()">Input?</button>
+
+<script>
+    function showInput() {
+        var userInput = prompt("Enter an URL:", "");
+        
+        if(userInput !== null){
+            console.log("URL введен пользователем: ", userInput); // Просто выводим введенный URL в консоль браузера
+        }
+    }
+</script>
 </body>
 </html>
