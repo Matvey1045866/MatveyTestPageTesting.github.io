@@ -41,16 +41,51 @@
     </script>
 <img scr="https://github.com/Matvey1045866/MatveyTestPageTesting.github.io/blob/main/IMG_0457.jpeg">
 <h3>This Web-Page in beta!</h3>
-<button onclick="showInput()">Input?</button>
+<button id="openModalBtn">Input an URL?</button>
+
+<!-- Модальное окно -->
+<div id="urlModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+    <div style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:300px; text-align:center; border-radius:8px;">
+        <p>Enter an URL:</p>
+        <input type="text" id="urlInput" placeholder="https://example.com" style="width:90%; padding:5px; margin-bottom:10px;">
+        <br>
+        <button id="gotoBtn" style="margin:5px; padding:5px 10px;">Goto URL</button>
+        <button id="cancelBtn" style="margin:5px; padding:5px 10px;">Cancel</button>
+    </div>
+</div>
 
 <script>
-    function showInput() {
-        var userInput = prompt("Enter an URL:", "");
-        
-        if(userInput !== null){
-            console.log("URL введен пользователем: ", userInput); // Просто выводим введенный URL в консоль браузера
+    const modal = document.getElementById("urlModal");
+    const openBtn = document.getElementById("openModalBtn");
+    const gotoBtn = document.getElementById("gotoBtn");
+    const cancelBtn = document.getElementById("cancelBtn");
+    const urlInput = document.getElementById("urlInput");
+
+    openBtn.onclick = () => {
+        modal.style.display = "block";
+        urlInput.value = "";
+        urlInput.focus();
+    };
+
+    gotoBtn.onclick = () => {
+        const url = urlInput.value.trim();
+        if (url) {
+            const validUrl = url.startsWith("http://") || url.startsWith("https://") ? url : "https://" + url;
+            window.location.href = validUrl;
+        } else {
+            alert("Введите корректный URL!");
         }
-    }
+    };
+
+    cancelBtn.onclick = () => {
+        modal.style.display = "none";
+    };
+
+    window.onclick = (event) => {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
 </script>
 </body>
 </html>
