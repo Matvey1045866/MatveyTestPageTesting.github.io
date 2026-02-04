@@ -163,5 +163,76 @@ document.getElementById("runBtn").onclick = async () => {
     }
 };
 </script>
+<h1>Or not JSON version:</h1>
+<!-- Подключаем Pyodide для выполнения Python в браузере -->
+<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+
+<h2>Mini Jupyter Notebook in Browser</h2>
+<div id="notebookContainer"></div>
+<button id="addCellBtn">+ Add Code Cell</button>
+
+<script>
+let pyodide;
+let pyodideReady = false;
+
+// Загружаем Python в браузере
+async function loadPyodideAndPackages() {
+    pyodide = await loadPyodide();
+    pyodideReady = true;
+}
+loadPyodideAndPackages();
+
+const container = document.getElementById("notebookContainer");
+
+// Функция для добавления новой ячейки
+function addCodeCell(code = "") {
+    const cellDiv = document.createElement("div");
+    cellDiv.style.margin = "10px 0";
+    cellDiv.style.padding = "10px";
+    cellDiv.style.border = "1px solid #ccc";
+    cellDiv.style.borderRadius = "5px";
+    cellDiv.style.background = "#f9f9f9";
+
+    const textarea = document.createElement("textarea");
+    textarea.style.width = "100%";
+    textarea.style.height = "100px";
+    textarea.value = code;
+
+    const runBtn = document.createElement("button");
+    runBtn.textContent = "Run";
+    runBtn.style.marginTop = "5px";
+
+    const output = document.createElement("pre");
+    output.style.background = "#eee";
+    output.style.padding = "5px";
+    output.style.marginTop = "5px";
+    output.style.minHeight = "20px";
+
+    runBtn.onclick = async () => {
+        if (!pyodideReady) {
+            alert("Python environment is loading, please wait...");
+            return;
+        }
+        output.textContent = "";
+        try {
+            const result = await pyodide.runPythonAsync(textarea.value);
+            output.textContent = result !== undefined ? result : "";
+        } catch(err) {
+            output.textContent = "Error: " + err;
+        }
+    };
+
+    cellDiv.appendChild(textarea);
+    cellDiv.appendChild(runBtn);
+    cellDiv.appendChild(output);
+    container.appendChild(cellDiv);
+}
+
+// Кнопка для добавления новых ячеек
+document.getElementById("addCellBtn").onclick = () => addCodeCell();
+
+// Добавим первую пустую ячейку по умолчанию
+addCodeCell("# Write Python code here\nprint('Hello World')");
+</script>
 </body>
 </html>
