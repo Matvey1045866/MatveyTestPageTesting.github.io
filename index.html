@@ -234,5 +234,39 @@ document.getElementById("addCellBtn").onclick = () => addCodeCell();
 // Добавим первую пустую ячейку по умолчанию
 addCodeCell("# Write Python code here\nprint('Hello World')");
 </script>
+<h2>Online HTML Editor</h2>
+
+<div style="display: flex; gap: 10px; margin-bottom: 5px;">
+    <button onclick="showTab('html')">HTML</button>
+    <button onclick="showTab('css')">CSS</button>
+    <button onclick="showTab('js')">JS</button>
+    <button onclick="runCode()">Run</button>
+</div>
+
+<!-- Редакторы -->
+<textarea id="htmlEditor" style="width:100%; height:150px;">&lt;h1>Hello World&lt;/h1></textarea>
+<textarea id="cssEditor" style="width:100%; height:150px; display:none;">h1 { color: blue; }</textarea>
+<textarea id="jsEditor" style="width:100%; height:150px; display:none;">console.log("Hello JS");</textarea>
+
+<h3>Live Preview:</h3>
+<iframe id="preview" style="width:100%; height:300px; border:1px solid #ccc;"></iframe>
+
+<script>
+function showTab(tab) {
+    document.getElementById("htmlEditor").style.display = tab === 'html' ? 'block' : 'none';
+    document.getElementById("cssEditor").style.display = tab === 'css' ? 'block' : 'none';
+    document.getElementById("jsEditor").style.display = tab === 'js' ? 'block' : 'none';
+}
+
+function runCode() {
+    const html = document.getElementById("htmlEditor").value;
+    const css = "<style>" + document.getElementById("cssEditor").value + "</style>";
+    const js = "<script>" + document.getElementById("jsEditor").value + "<\/script>";
+    const preview = document.getElementById("preview");
+
+    // Записываем HTML+CSS+JS в iframe
+    preview.srcdoc = html + css + js;
+}
+</script>
 </body>
 </html>
