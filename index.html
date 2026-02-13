@@ -2,139 +2,210 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>CMS с URL‑навигацией</title>
+  <title>Gemini AI — Генератор контента</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #f9fafc; min-height: 100vh; color: #333; line-height: 1.6; }
-    .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
-    header { background: #4a5568; color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-    h1 { font-size: 1.5em; margin: 0; }
-    .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-    .btn-primary { background: #6b46c1; color: white; }
-    .btn-danger { background: #e53e3e; color: white; }
-    .btn-success { background: #48bb78; color: white; }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-    input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1em; }
-    label { display: block; margin-bottom: 5px; font-weight: 600; color: #4a5568; }
-    .form-group { margin-bottom: 15px; }
-    .page { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 20px; }
-    .page h2 { margin-top: 0; color: #2d3748; }
-    .nav { margin: 20px 0; padding: 10px; background: #ebf4ff; border-radius: 8px; }
-    .nav a { color: #6b46c1; text-decoration: none; margin-right: 15px; font-weight: 600; }
-    .nav a:hover { text-decoration: underline; }
-    .message { padding: 10px; margin: 10px 0; border-radius: 6px; }
-    .error { background: #fee; border: 1px solid #e53e3e; color: #e53e3e; }
-    .success { background: #edf9f2; border: 1px solid #48bb78; color: #48bb78; }
-    #editor { display: none; margin-top: 20px; padding: 20px; background: #f7fafc; border-radius: 8px; }
+    * {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    header {
+      background: #4361ee;
+      color: white;
+      padding: 25px 30px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2em;
+      font-weight: 600;
+    }
+    .content {
+      padding: 30px;
+      background: #f9fafc;
+    }
+    .form-group {
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 0.95em;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1em;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4361ee;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    button {
+      background: #4361ee;
+      color: white;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1em;
+      transition: background 0.3s, transform 0.2s;
+      display: inline-block;
+    }
+    button:hover {
+      background: #3a52d4;
+      transform: translateY(-2px);
+    }
+    button:disabled {
+      background: #a0aec0;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result {
+      margin-top: 30px;
+      padding: 25px;
+      background: #edf7ff;
+      border-radius: 12px;
+      border: 2px dashed #4361ee;
+    }
+    .result h3 {
+      margin: 0 0 15px 0;
+      color: #4361ee;
+      font-size: 1.3em;
+    }
+    .result p {
+      line-height: 1.7;
+      color: #2d3748;
+    }
+    .error {
+      padding: 16px;
+      background: #fee;
+      border-left: 4px solid #e53e3e;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #e53e3e;
+      font-weight: 500;
+    }
+    .loading {
+      padding: 16px;
+      background: #ebf4ff;
+      border-left: 4px solid #4361ee;
+      border-radius: 8px;
+      margin: 20px 0;
+      color: #4a5568;
+      font-style: italic;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #718096;
+      font-size: 0.9em;
+      background: #f7fafc;
+      border-top: 1px solid #e2e8f0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>CMS с URL‑навигацией</h1>
-      <button class="btn btn-danger" onclick="logout()">Выход</button>
+      <h1>🤖 Gemini AI Генератор</h1>
     </header>
 
-    <!-- Навигация -->
-    <div class="nav" id="nav"></div>
-
-    <!-- Сообщение -->
-    <div id="message"></div>
-
-    <!-- Страница (контент) -->
-    <div class="page" id="page-content">
-      <h2>Главная</h2>
-      <p>Это главная страница. Используйте навигацию выше, чтобы перейти к другим страницам.</p>
-    </div>
-
-    <!-- Редактор для создания/редактирования -->
-    <div id="editor">
-      <h3>Редактор страницы</h3>
+    <div class="content">
+      <!-- Поле для API‑ключа -->
       <div class="form-group">
-        <label>Заголовок</label>
-        <input type="text" id="edit-title">
+        <label for="api-key">API‑ключ Gemini (<a href="https://aistudio.google.com/" target="_blank" style="color:#4361ee;">получить здесь</a>)</label>
+        <input type="text" id="api-key" placeholder="Введите ваш ключ из Google AI Studio" autocomplete="off">
       </div>
+
+      <!-- Поле для промпта -->
       <div class="form-group">
-        <label>Содержимое</label>
-        <textarea id="edit-content" rows="6"></textarea>
+        <label for="prompt">Ваш запрос к ИИ</label>
+        <textarea id="prompt" rows="5" placeholder="Например: «Напиши краткий обзор о квантовых вычислениях»"></textarea>
       </div>
-      <button class="btn btn-success" onclick="savePage()">Сохранить</button>
-      <button class="btn btn-danger" onclick="cancelEdit()">Отмена</button>
+
+      <!-- Кнопка отправки -->
+      <button onclick="generateContent()">Сгенерировать ответ</button>
+
+      <!-- Индикатор загрузки -->
+      <div id="loading" class="loading">Ожидание ответа от ИИ...</div>
+
+      <!-- Сообщение об ошибке -->
+      <div id="error" class="error" style="display: none;"></div>
+
+      <!-- Результат -->
+      <div id="result" class="result" style="display: none;">
+        <h3>Ответ Gemini:</h3>
+        <p id="response-text"></p>
+      </div>
     </div>
 
-    <!-- Форма входа (показывается при отсутствии авторизации) -->
-    <div id="login-form" style="display: none; text-align: center; padding: 40px 20px;">
-      <h2>Войдите в систему</h2>
-      <input type="text" id="username" placeholder="Логин" style="width: 80%; max-width: 300px;"><br>
-      <input type="password" id="password" placeholder="Пароль" style="width: 80%; max-width: 300px; margin: 10px 0;"><br>
-      <button class="btn btn-primary" onclick="login()">Войти</button>
-      <div id="login-error" style="margin-top: 10px; color: #e53e3e;"></div>
-    </div>
+    <footer>
+      &copy; 2024 Gemini AI Demo. Для обучения и прототипирования.
+    </footer>
   </div>
 
-  <script>
-    // Инициализация данных
-    function initStorage() {
-      if (!localStorage.getItem('cmsUsers')) {
-        localStorage.setItem('cmsUsers', JSON.stringify([
-          { username: 'admin', password: '12345' }
-        ]));
-      }
-      if (!localStorage.getItem('cmsPages')) {
-        localStorage.setItem('cmsPages', JSON.stringify([
-          { slug: 'home', title: 'Главная', content: 'Это главная страница системы.' }
-        ]));
-      }
-    }
+  <!-- Подключение библиотеки Gemini через CDN -->
+  <script type="module">
+    import { GoogleGenerativeAI } from 'https://esm.sh/@google/generative-ai';
 
-    initStorage();
+    /**
+     * Функция генерации контента через Gemini API
+     */
+    async function generateContent() {
+      // Скрываем предыдущие сообщения
+      document.getElementById('error').style.display = 'none';
+      document.getElementById('result').style.display = 'none';
+      document.getElementById('loading').style.display = 'block';
 
-    // Проверка авторизации
-    function checkAuth() {
-      return localStorage.getItem('isAuthenticated') === 'true';
-    }
+      try {
+        const apiKey = document.getElementById('api-key').value.trim();
+        const prompt = document.getElementById('prompt').value.trim();
 
-    // Показать форму входа
-    function showLogin() {
-      document.getElementById('login-form').style.display = 'block';
-      document.querySelector('.nav').style.display = 'none';
-      document.getElementById('page-content').style.display = 'none';
-      document.getElementById('editor').style.display = 'none';
-    }
+        // Проверка полей
+        if (!apiKey) {
+          throw new Error('Пожалуйста, введите API‑ключ.');
+        }
+        if (!prompt) {
+          throw new Error('Пожалуйста, введите запрос к ИИ.');
+        }
 
-    // Показать интерфейс CMS
-    function showCMS() {
-      document.getElementById('login-form').style.display = 'none';
-      renderNav();
-      renderPage();
-    }
+        // Инициализация клиента Gemini
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-    // Вход
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+        // Отправка запроса
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
 
-      const users = JSON.parse(localStorage.getItem('cmsUsers'));
-      const user = users.find(u => u.username === username && u.password === password);
-
-      if (user) {
-        localStorage.setItem('isAuthenticated', 'true');
-        showCMS();
-      } else {
-        document.getElementById('login-error').textContent = 'Неверный логин или пароль.';
-      }
-    }
-
-    // Выход
-    function logout() {
-      localStorage.removeItem('isAuthenticated');
-      showLogin();
-    }
-
-    // Рендеринг навигации
-    function renderNav() {
-      const pages = JSON.parse(localStorage.getItem('cmsPages'));
-      const nav = document.getElementById('nav');
-      let links = '<a href="#home">Главная</a> ';
-
-      pages.forEach(page => {
+        // Отображение результата
+        document.getElementById('response-text').textContent = text;
+        document.getElementById('result').style.display = 'block';
+      } catch (error) {
+        // Обработка ошибок
