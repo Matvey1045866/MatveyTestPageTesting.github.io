@@ -1,274 +1,224 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <a href="https://matvey1045866.github.io/MatveyTestPageTesting.github.io/">Reload</a>
-    <meta charset="UTF-8">
-    <title>MatveyTest Testing Page!</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Система входа и страниц</title>
+  <style>
+    * {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.5em;
+    }
+    .logout-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .login-form, .dashboard {
+      padding: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #218837;
+    }
+    .pages {
+      margin-top: 20px;
+    }
+    .page {
+      border: 1px solid #eee;
+      border-radius: 4px;
+      padding: 15px;
+      margin-bottom: 10px;
+      background-color: #fafafa;
+    }
+    .page h3 {
+      margin: 0 0 5px 0;
+      color: #333;
+    }
+    .error {
+      color: #dc3545;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <h1>MatveyTest Testing Page!</h1>
-    <button onclick="window.location.href='https://github.com/Matvey1045866/MatveyTestPageTesting.github.io/tree/main'">Pass Test</button><br/><br/>
-    <button onclick="downloadFile()">Download Pass Test</button>
-    
-    <script>
-        function downloadFile() {
-            const link = document.createElement('a');
-            link.href = 'test.py';
-            link.download = 'test.py';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    </script>
-<img scr="https://github.com/Matvey1045866/MatveyTestPageTesting.github.io/blob/main/IMG_0457.jpeg">
-<h3>This Web-Page in beta!</h3>
-<button id="openModalBtn">Input an URL?</button>
-
-<!-- Модальное окно -->
-<div id="urlModal" class="modal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
-    <div style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:300px; text-align:center; border-radius:8px;">
-        <p>Enter an URL:</p>
-        <input type="text" id="urlInput" placeholder="https://example.com" style="width:90%; padding:5px; margin-bottom:10px;">
-        <br>
-        <button id="gotoBtn" style="margin:5px; padding:5px 10px;">Goto URL</button>
-        <button id="cancelBtn" style="margin:5px; padding:5px 10px;">Cancel</button>
+  <div class="container">
+    <!-- Форма входа -->
+    <div id="login-form" class="login-form">
+      <h2>Вход в систему</h2>
+      <div id="error-message" class="error"></div>
+      <input type="text" id="username" placeholder="Логин" required>
+      <input type="password" id="password" placeholder="Пароль" required>
+      <button onclick="login()">Войти</button>
     </div>
-</div>
 
-<script>
-    const modal = document.getElementById("urlModal");
-    const openBtn = document.getElementById("openModalBtn");
-    const gotoBtn = document.getElementById("gotoBtn");
-    const cancelBtn = document.getElementById("cancelBtn");
-    const urlInput = document.getElementById("urlInput");
+    <!-- Панель управления (скрыта до входа) -->
+    <div id="dashboard" class="dashboard" style="display: none;">
+      <header>
+        <h1>Панель управления</h1>
+        <button class="logout-btn" onclick="logout()">Выход</button>
+      </header>
 
-    openBtn.onclick = () => {
-        modal.style.display = "block";
-        urlInput.value = "";
-        urlInput.focus();
-    };
+      <h2>Добавить страницу</h2>
+      <input type="text" id="page-title" placeholder="Заголовок страницы">
+      <textarea id="page-content" placeholder="Содержимое страницы" rows="4"></textarea>
+      <button onclick="addPage()">Добавить страницу</button>
 
-    gotoBtn.onclick = () => {
-        const url = urlInput.value.trim();
-        if (url) {
-            const validUrl = url.startsWith("http://") || url.startsWith("https://") ? url : "https://" + url;
-            window.location.href = validUrl;
-        } else {
-            alert("Введите корректный URL!");
-        }
-    };
+      <div class="pages" id="pages-list">
+        <!-- Здесь будут отображаться страницы -->
+      </div>
+    </div>
+  </div>
 
-    cancelBtn.onclick = () => {
-        modal.style.display = "none";
-    };
-
-    window.onclick = (event) => {
-        if (event.target === modal) {
-            modal.style.display = "none";
-        }
-    };
-</script>
-<!-- Подключаем Pyodide для выполнения Python в браузере -->
-<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
-
-<h2>Jupyter Notebook Editor & Runner (.ipynb)</h2>
-
-<textarea id="notebookEditor" style="width:100%; height:300px;">
-{
-  "cells": [
-    {
-      "cell_type": "code",
-      "execution_count": null,
-      "metadata": {},
-      "outputs": [],
-      "source": [
-        "print('Hello from .ipynb')"
-      ]
+  <script>
+    // Инициализация данных при первом запуске
+    if (!localStorage.getItem('users')) {
+      localStorage.setItem('users', JSON.stringify([
+        { username: 'admin', password: '12345' }
+      ]));
     }
-  ],
-  "metadata": {},
-  "nbformat": 4,
-  "nbformat_minor": 5
-}
-</textarea>
-<br>
-<button id="runBtn">Run Notebook</button>
 
-<h3>Output:</h3>
-<pre id="output" style="background:#f0f0f0; padding:10px; border:1px solid #ccc;"></pre>
+    if (!localStorage.getItem('pages')) {
+      localStorage.setItem('pages', JSON.stringify([]));
+    }
 
-<script>
-let pyodideReady = false;
-let pyodide;
+    // Проверка авторизации при загрузке страницы
+    window.onload = function() {
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        showDashboard();
+      } else {
+        showLogin();
+      }
+    };
 
-async function loadPyodideAndPackages() {
-    pyodide = await loadPyodide();
-    pyodideReady = true;
-}
+    // Функция входа
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const users = JSON.parse(localStorage.getItem('users'));
 
-loadPyodideAndPackages();
+      const user = users.find(u => u.username === username && u.password === password);
 
-document.getElementById("runBtn").onclick = async () => {
-    if (!pyodideReady) {
-        alert("Python environment is loading, please wait...");
+      if (user) {
+        localStorage.setItem('isLogged cyn', 'true');
+        showDashboard();
+      } else {
+        document.getElementById('error-message').textContent = 
+          'Неверный логин или пароль!';
+      }
+    }
+
+    // Функция выхода
+    function logout() {
+      localStorage.removeItem('isLoggedIn');
+      showLogin();
+    }
+
+    // Показать форму входа
+    function showLogin() {
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    // Показать панель управления
+    function showDashboard() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadPages();
+    }
+
+    // Добавить страницу
+    function addPage() {
+      const title = document.getElementById('page-title').value;
+      const content = document.getElementById('page-content').value;
+
+      if (!title || !content) {
+        alert('Заполните все поля!');
         return;
+      }
+
+      const pages = JSON.parse(localStorage.getItem('pages'));
+      pages.push({
+        id: Date.now(), // Уникальный ID
+        title: title,
+        content: content
+      });
+
+      localStorage.setItem('pages', JSON.stringify(pages));
+
+      // Очищаем поля
+      document.getElementById('page-title').value = '';
+      document.getElementById('page-content').value = '';
+
+      // Обновляем список
+      loadPages();
     }
 
-    const editorContent = document.getElementById("notebookEditor").value;
-    let notebook;
-    try {
-        notebook = JSON.parse(editorContent);
-    } catch(e) {
-        alert("Invalid JSON! Make sure it's a valid .ipynb structure.");
+    // Загрузить страницы из localStorage
+    function loadPages() {
+      const pages = JSON.parse(localStorage.getItem('pages'));
+      const container = document.getElementById('pages-list');
+      container.innerHTML = '';
+
+      if (pages.length === 0) {
+        container.innerHTML = '<p>Нет созданных страниц.</p>';
         return;
+      }
+
+      pages.forEach(page => {
+        const pageElement = document.createElement('div');
+        pageElement.className = 'page';
+        pageElement.innerHTML = `
+          <h3>${page.title}</h3>
+          <p>${page.content}</p>
+        `;
+        container.appendChild(pageElement);
+      });
     }
-
-    const outputArea = document.getElementById("output");
-    outputArea.textContent = "";
-
-    if (!notebook.cells || !Array.isArray(notebook.cells)) {
-        alert("No cells found in notebook!");
-        return;
-    }
-
-    for (let cell of notebook.cells) {
-        if (cell.cell_type === "code" && cell.source) {
-            const code = Array.isArray(cell.source) ? cell.source.join('') : cell.source;
-            try {
-                let result = await pyodide.runPythonAsync(code);
-                outputArea.textContent += result + "\n";
-            } catch(err) {
-                outputArea.textContent += "Error: " + err + "\n";
-            }
-        }
-    }
-};
-</script>
-<h1>Or not JSON version:</h1>
-<!-- Подключаем Pyodide для выполнения Python в браузере -->
-<script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
-
-<h2>Mini Jupyter Notebook in Browser</h2>
-<div id="notebookContainer"></div>
-<button id="addCellBtn">+ Add Code Cell</button>
-
-<script>
-let pyodide;
-let pyodideReady = false;
-
-// Загружаем Python в браузере
-async function loadPyodideAndPackages() {
-    pyodide = await loadPyodide();
-    pyodideReady = true;
-}
-loadPyodideAndPackages();
-
-const container = document.getElementById("notebookContainer");
-
-// Функция для добавления новой ячейки
-function addCodeCell(code = "") {
-    const cellDiv = document.createElement("div");
-    cellDiv.style.margin = "10px 0";
-    cellDiv.style.padding = "10px";
-    cellDiv.style.border = "1px solid #ccc";
-    cellDiv.style.borderRadius = "5px";
-    cellDiv.style.background = "#f9f9f9";
-
-    const textarea = document.createElement("textarea");
-    textarea.style.width = "100%";
-    textarea.style.height = "100px";
-    textarea.value = code;
-
-    const runBtn = document.createElement("button");
-    runBtn.textContent = "Run";
-    runBtn.style.marginTop = "5px";
-
-    const output = document.createElement("pre");
-    output.style.background = "#eee";
-    output.style.padding = "5px";
-    output.style.marginTop = "5px";
-    output.style.minHeight = "20px";
-
-    runBtn.onclick = async () => {
-        if (!pyodideReady) {
-            alert("Python environment is loading, please wait...");
-            return;
-        }
-        output.textContent = "";
-        try {
-            const result = await pyodide.runPythonAsync(textarea.value);
-            output.textContent = result !== undefined ? result : "";
-        } catch(err) {
-            output.textContent = "Error: " + err;
-        }
-    };
-
-    cellDiv.appendChild(textarea);
-    cellDiv.appendChild(runBtn);
-    cellDiv.appendChild(output);
-    container.appendChild(cellDiv);
-}
-
-// Кнопка для добавления новых ячеек
-document.getElementById("addCellBtn").onclick = () => addCodeCell();
-
-// Добавим первую пустую ячейку по умолчанию
-addCodeCell("# Write Python code here\nprint('Hello World')");
-</script>
-<h2>Online HTML Editor</h2>
-
-<div style="display: flex; gap: 10px; margin-bottom: 5px;">
-    <button onclick="showTab('html')">HTML</button>
-    <button onclick="showTab('css')">CSS</button>
-    <button onclick="showTab('js')">JS</button>
-    <button onclick="runCode()">Run</button>
-</div>
-
-<!-- Редакторы -->
-<textarea id="htmlEditor" style="width:100%; height:150px;">&lt;h1>Hello World&lt;/h1></textarea>
-<textarea id="cssEditor" style="width:100%; height:150px; display:none;">h1 { color: blue; }</textarea>
-<textarea id="jsEditor" style="width:100%; height:150px; display:none;">console.log("Hello JS");</textarea>
-
-<h3>Live Preview:</h3>
-<iframe id="preview" style="width:100%; height:300px; border:1px solid #ccc;"></iframe>
-
-<script>
-function showTab(tab) {
-    document.getElementById("htmlEditor").style.display = tab === 'html' ? 'block' : 'none';
-    document.getElementById("cssEditor").style.display = tab === 'css' ? 'block' : 'none';
-    document.getElementById("jsEditor").style.display = tab === 'js' ? 'block' : 'none';
-}
-
-function runCode() {
-    const html = document.getElementById("htmlEditor").value;
-    const css = "<style>" + document.getElementById("cssEditor").value + "</style>";
-    const js = "<script>" + document.getElementById("jsEditor").value + "<\/script>";
-    const preview = document.getElementById("preview");
-
-    // Записываем HTML+CSS+JS в iframe
-    preview.srcdoc = html + css + js;
-}
-</script>
-
+  </script>
 </body>
 </html>
