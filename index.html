@@ -2,223 +2,139 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Система входа и страниц</title>
+  <title>CMS с URL‑навигацией</title>
   <style>
-    * {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      padding: 20px;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      overflow: hidden;
-    }
-    header {
-      background-color: #007BFF;
-      color: white;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    h1 {
-      margin: 0;
-      font-size: 1.5em;
-    }
-    .logout-btn {
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .login-form, .dashboard {
-      padding: 20px;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      background-color: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-    button:hover {
-      background-color: #218837;
-    }
-    .pages {
-      margin-top: 20px;
-    }
-    .page {
-      border: 1px solid #eee;
-      border-radius: 4px;
-      padding: 15px;
-      margin-bottom: 10px;
-      background-color: #fafafa;
-    }
-    .page h3 {
-      margin: 0 0 5px 0;
-      color: #333;
-    }
-    .error {
-      color: #dc3545;
-      margin: 10px 0;
-      font-weight: bold;
-    }
+    * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #f9fafc; min-height: 100vh; color: #333; line-height: 1.6; }
+    .container { max-width: 1000px; margin: 20px auto; padding: 20px; }
+    header { background: #4a5568; color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+    h1 { font-size: 1.5em; margin: 0; }
+    .btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+    .btn-primary { background: #6b46c1; color: white; }
+    .btn-danger { background: #e53e3e; color: white; }
+    .btn-success { background: #48bb78; color: white; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    input, textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1em; }
+    label { display: block; margin-bottom: 5px; font-weight: 600; color: #4a5568; }
+    .form-group { margin-bottom: 15px; }
+    .page { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-top: 20px; }
+    .page h2 { margin-top: 0; color: #2d3748; }
+    .nav { margin: 20px 0; padding: 10px; background: #ebf4ff; border-radius: 8px; }
+    .nav a { color: #6b46c1; text-decoration: none; margin-right: 15px; font-weight: 600; }
+    .nav a:hover { text-decoration: underline; }
+    .message { padding: 10px; margin: 10px 0; border-radius: 6px; }
+    .error { background: #fee; border: 1px solid #e53e3e; color: #e53e3e; }
+    .success { background: #edf9f2; border: 1px solid #48bb78; color: #48bb78; }
+    #editor { display: none; margin-top: 20px; padding: 20px; background: #f7fafc; border-radius: 8px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Форма входа -->
-    <div id="login-form" class="login-form">
-      <h2>Вход в систему</h2>
-      <div id="error-message" class="error"></div>
-      <input type="text" id="username" placeholder="Логин" required>
-      <input type="password" id="password" placeholder="Пароль" required>
-      <button onclick="login()">Войти</button>
+    <header>
+      <h1>CMS с URL‑навигацией</h1>
+      <button class="btn btn-danger" onclick="logout()">Выход</button>
+    </header>
+
+    <!-- Навигация -->
+    <div class="nav" id="nav"></div>
+
+    <!-- Сообщение -->
+    <div id="message"></div>
+
+    <!-- Страница (контент) -->
+    <div class="page" id="page-content">
+      <h2>Главная</h2>
+      <p>Это главная страница. Используйте навигацию выше, чтобы перейти к другим страницам.</p>
     </div>
 
-    <!-- Панель управления (скрыта до входа) -->
-    <div id="dashboard" class="dashboard" style="display: none;">
-      <header>
-        <h1>Панель управления</h1>
-        <button class="logout-btn" onclick="logout()">Выход</button>
-      </header>
-
-      <h2>Добавить страницу</h2>
-      <input type="text" id="page-title" placeholder="Заголовок страницы">
-      <textarea id="page-content" placeholder="Содержимое страницы" rows="4"></textarea>
-      <button onclick="addPage()">Добавить страницу</button>
-
-      <div class="pages" id="pages-list">
-        <!-- Здесь будут отображаться страницы -->
+    <!-- Редактор для создания/редактирования -->
+    <div id="editor">
+      <h3>Редактор страницы</h3>
+      <div class="form-group">
+        <label>Заголовок</label>
+        <input type="text" id="edit-title">
       </div>
+      <div class="form-group">
+        <label>Содержимое</label>
+        <textarea id="edit-content" rows="6"></textarea>
+      </div>
+      <button class="btn btn-success" onclick="savePage()">Сохранить</button>
+      <button class="btn btn-danger" onclick="cancelEdit()">Отмена</button>
+    </div>
+
+    <!-- Форма входа (показывается при отсутствии авторизации) -->
+    <div id="login-form" style="display: none; text-align: center; padding: 40px 20px;">
+      <h2>Войдите в систему</h2>
+      <input type="text" id="username" placeholder="Логин" style="width: 80%; max-width: 300px;"><br>
+      <input type="password" id="password" placeholder="Пароль" style="width: 80%; max-width: 300px; margin: 10px 0;"><br>
+      <button class="btn btn-primary" onclick="login()">Войти</button>
+      <div id="login-error" style="margin-top: 10px; color: #e53e3e;"></div>
     </div>
   </div>
 
   <script>
-    // Инициализация данных при первом запуске
-    if (!localStorage.getItem('users')) {
-      localStorage.setItem('users', JSON.stringify([
-        { username: 'admin', password: '12345' }
-      ]));
-    }
-
-    if (!localStorage.getItem('pages')) {
-      localStorage.setItem('pages', JSON.stringify([]));
-    }
-
-    // Проверка авторизации при загрузке страницы
-    window.onload = function() {
-      if (localStorage.getItem('isLoggedIn') === 'true') {
-        showDashboard();
-      } else {
-        showLogin();
+    // Инициализация данных
+    function initStorage() {
+      if (!localStorage.getItem('cmsUsers')) {
+        localStorage.setItem('cmsUsers', JSON.stringify([
+          { username: 'admin', password: '12345' }
+        ]));
       }
-    };
-
-    // Функция входа
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const users = JSON.parse(localStorage.getItem('users'));
-
-      const user = users.find(u => u.username === username && u.password === password);
-
-      if (user) {
-        localStorage.setItem('isLogged cyn', 'true');
-        showDashboard();
-      } else {
-        document.getElementById('error-message').textContent = 
-          'Неверный логин или пароль!';
+      if (!localStorage.getItem('cmsPages')) {
+        localStorage.setItem('cmsPages', JSON.stringify([
+          { slug: 'home', title: 'Главная', content: 'Это главная страница системы.' }
+        ]));
       }
     }
 
-    // Функция выхода
-    function logout() {
-      localStorage.removeItem('isLoggedIn');
-      showLogin();
+    initStorage();
+
+    // Проверка авторизации
+    function checkAuth() {
+      return localStorage.getItem('isAuthenticated') === 'true';
     }
 
     // Показать форму входа
     function showLogin() {
       document.getElementById('login-form').style.display = 'block';
-      document.getElementById('dashboard').style.display = 'none';
+      document.querySelector('.nav').style.display = 'none';
+      document.getElementById('page-content').style.display = 'none';
+      document.getElementById('editor').style.display = 'none';
     }
 
-    // Показать панель управления
-    function showDashboard() {
+    // Показать интерфейс CMS
+    function showCMS() {
       document.getElementById('login-form').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'block';
-      loadPages();
+      renderNav();
+      renderPage();
     }
 
-    // Добавить страницу
-    function addPage() {
-      const title = document.getElementById('page-title').value;
-      const content = document.getElementById('page-content').value;
+    // Вход
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-      if (!title || !content) {
-        alert('Заполните все поля!');
-        return;
+      const users = JSON.parse(localStorage.getItem('cmsUsers'));
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem('isAuthenticated', 'true');
+        showCMS();
+      } else {
+        document.getElementById('login-error').textContent = 'Неверный логин или пароль.';
       }
-
-      const pages = JSON.parse(localStorage.getItem('pages'));
-      pages.push({
-        id: Date.now(), // Уникальный ID
-        title: title,
-        content: content
-      });
-
-      localStorage.setItem('pages', JSON.stringify(pages));
-
-      // Очищаем поля
-      document.getElementById('page-title').value = '';
-      document.getElementById('page-content').value = '';
-
-      // Обновляем список
-      loadPages();
     }
 
-    // Загрузить страницы из localStorage
-    function loadPages() {
-      const pages = JSON.parse(localStorage.getItem('pages'));
-      const container = document.getElementById('pages-list');
-      container.innerHTML = '';
+    // Выход
+    function logout() {
+      localStorage.removeItem('isAuthenticated');
+      showLogin();
+    }
 
-      if (pages.length === 0) {
-        container.innerHTML = '<p>Нет созданных страниц.</p>';
-        return;
-      }
+    // Рендеринг навигации
+    function renderNav() {
+      const pages = JSON.parse(localStorage.getItem('cmsPages'));
+      const nav = document.getElementById('nav');
+      let links = '<a href="#home">Главная</a> ';
 
       pages.forEach(page => {
-        const pageElement = document.createElement('div');
-        pageElement.className = 'page';
-        pageElement.innerHTML = `
-          <h3>${page.title}</h3>
-          <p>${page.content}</p>
-        `;
-        container.appendChild(pageElement);
-      });
-    }
-  </script>
-</body>
-</html>
