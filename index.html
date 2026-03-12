@@ -73,110 +73,107 @@
             opacity: 0.8;
         }
 
-        .user-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-            max-height: 500px;
-            overflow-y: auto;
-            padding-right: 8px;
+        /* стили для выпадающего списка */
+        .select-container {
+            margin-bottom: 24px;
         }
 
-        .user-btn {
-            padding: 16px 20px;
-            font-size: 1.2rem;
+        .select-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4a2b6e;
             font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-select {
+            width: 100%;
+            padding: 18px 24px;
+            font-size: 1.2rem;
+            border: 2px solid #e0d0ff;
+            border-radius: 60px;
+            outline: none;
+            background: white;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a2b6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 20px;
+        }
+
+        .user-select:focus {
+            border-color: #C850C0;
+            box-shadow: 0 0 0 3px rgba(200, 80, 192, 0.1);
+        }
+
+        .user-select option {
+            font-size: 1.1rem;
+            padding: 12px;
+        }
+
+        .user-select option:disabled {
+            color: #999;
+            background: #f5f5f5;
+        }
+
+        .online-status-option {
+            color: #4caf50;
+            font-size: 0.9rem;
+            margin-left: 8px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(112deg, #4158D0, #C850C0);
+            color: white;
             border: none;
             border-radius: 60px;
-            background: linear-gradient(145deg, #f0e6ff, #e0d0ff);
-            color: #4a2b6e;
+            font-size: 1.3rem;
+            font-weight: 700;
             cursor: pointer;
             transition: 0.2s;
-            text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            width: 100%;
-            position: relative;
+            margin-bottom: 16px;
             border: 2px solid transparent;
         }
 
-        .user-btn:hover:not(.disabled) {
+        .login-btn:hover:not(:disabled) {
             transform: scale(1.02);
-            background: linear-gradient(145deg, #e5d5ff, #d0bcff);
-            box-shadow: 0 10px 20px rgba(159, 122, 234, 0.3);
-            border-color: #b38cfa;
+            border-color: white;
+            box-shadow: 0 10px 20px rgba(193, 80, 192, 0.4);
         }
 
-        .user-btn.disabled {
-            opacity: 0.6;
+        .login-btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
-            filter: grayscale(0.4);
-            background: #e0e0e0;
+            background: linear-gradient(112deg, #999, #777);
         }
 
-        .user-btn .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #b38cfa, #9f7aea);
+        .user-status {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
-            flex-shrink: 0;
-            text-transform: uppercase;
-            background-size: cover;
-            background-position: center;
+            gap: 8px;
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 40px;
+            background: #f0e6ff;
         }
 
-        /* Специальные цвета для аватарок */
-        .user-btn[data-username="Полина"] .avatar {
-            background: linear-gradient(145deg, #ff9a9e, #fad0c4);
-        }
-
-        .user-btn[data-username="Раяна"] .avatar {
-            background: linear-gradient(145deg, #a18cd1, #fbc2eb);
-        }
-
-        .user-btn[data-username="Мадина"] .avatar {
-            background: linear-gradient(145deg, #96fbc4, #f9f586);
-        }
-
-        .user-btn[data-username="Даша"] .avatar {
-            background: linear-gradient(145deg, #fbc2eb, #a6c1ee);
-        }
-
-        .user-btn[data-username="Матвей (владелец сайта)"] .avatar {
-            background: linear-gradient(145deg, #ff9a9e, #fecfef);
-            border: 3px solid gold;
-            box-shadow: 0 0 15px gold;
-        }
-
-        .online-badge {
-            margin-left: auto;
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
             background: #4caf50;
-            color: white;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            white-space: nowrap;
         }
 
-        .offline-badge {
-            margin-left: auto;
+        .status-dot.offline {
             background: #9e9e9e;
-            color: white;
-            padding: 4px 14px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            white-space: nowrap;
+        }
+
+        .status-text {
+            color: #4a2b6e;
+            font-size: 0.95rem;
         }
 
         /* основной интерфейс */
@@ -731,11 +728,24 @@
         <div class="modal">
             <h2>ChatGChat</h2>
             <h3>ЧатGЧат</h3>
-            <div class="user-buttons" id="userButtons">
-                <!-- кнопки будут сгенерированы динамически -->
-                <div style="text-align: center; padding: 20px; color: #8f7aaa;">👥 Загрузка пользователей...</div>
+            
+            <div class="select-container">
+                <label>👤 Выбери своё имя:</label>
+                <select class="user-select" id="userSelect">
+                    <option value="" disabled selected>— Загрузка пользователей —</option>
+                </select>
             </div>
-            <p style="text-align: center; color: #8f7aaa; font-size: 0.9rem;">Выбери своё имя чтобы войти</p>
+
+            <div class="user-status" id="userStatus">
+                <div class="status-dot offline" id="statusDot"></div>
+                <span class="status-text" id="statusText">Выберите имя из списка</span>
+            </div>
+
+            <button class="login-btn" id="loginBtn" disabled>🚪 Войти в чат</button>
+            
+            <p style="text-align: center; color: #8f7aaa; font-size: 0.9rem; margin-top: 16px;">
+                Если имя занято — вход будет недоступен
+            </p>
         </div>
     </div>
 
@@ -859,11 +869,15 @@
         let onlineCheckInterval = null;
         let userStatuses = new Map();
         let editingUserId = null;
+        let availableUsers = [];
 
         // DOM элементы
         const registerModal = document.getElementById('registerModal');
         const messengerApp = document.getElementById('messengerApp');
-        const userButtons = document.getElementById('userButtons');
+        const userSelect = document.getElementById('userSelect');
+        const loginBtn = document.getElementById('loginBtn');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
         const usernameDisplay = document.getElementById('usernameDisplay');
         const logoutBtn = document.getElementById('logoutBtn');
         const usersList = document.getElementById('usersList');
@@ -945,6 +959,62 @@
             }, 3000);
         }
 
+        // Обновить статус выбранного пользователя
+        function updateSelectedUserStatus() {
+            const selectedUsername = userSelect.value;
+            if (!selectedUsername) {
+                statusDot.className = 'status-dot offline';
+                statusText.textContent = 'Выберите имя из списка';
+                loginBtn.disabled = true;
+                return;
+            }
+
+            const status = userStatuses.get(selectedUsername) || { isOnline: false };
+            const user = BASE_USERS.find(u => u.username === selectedUsername);
+            
+            if (status.isOnline) {
+                statusDot.className = 'status-dot online';
+                statusText.textContent = `${selectedUsername} сейчас в сети — вход невозможен`;
+                loginBtn.disabled = true;
+            } else {
+                statusDot.className = 'status-dot offline';
+                statusText.textContent = `${selectedUsername} не в сети — можно войти`;
+                loginBtn.disabled = false;
+            }
+
+            // Проверка доступа
+            if (user && user.access === 'no') {
+                statusText.textContent = `${selectedUsername} заблокирован`;
+                loginBtn.disabled = true;
+            }
+        }
+
+        // Заполнить выпадающий список
+        async function populateUserSelect() {
+            console.log('🔄 Заполняем список пользователей...');
+            
+            let options = '<option value="" disabled selected>— Выберите имя —</option>';
+            
+            for (const user of BASE_USERS) {
+                const status = userStatuses.get(user.username) || { isOnline: false, access: 'full' };
+                const isOnline = status.isOnline;
+                const isBanned = user.access === 'no' || status.access === 'no';
+                
+                let statusText = '';
+                if (isBanned) statusText = ' (заблокирован)';
+                else if (isOnline) statusText = ' (в сети)';
+                
+                options += `<option value="${user.username}" ${isOnline || isBanned ? 'disabled' : ''}>
+                    ${user.username}${statusText}
+                </option>`;
+            }
+            
+            userSelect.innerHTML = options;
+            console.log('✅ Список заполнен');
+            
+            updateSelectedUserStatus();
+        }
+
         // Проверка кто онлайн
         async function checkOnlineStatuses() {
             try {
@@ -974,56 +1044,10 @@
                     });
                 });
 
-                renderUserButtons();
+                await populateUserSelect();
             } catch (error) {
                 console.error('Error checking online statuses:', error);
             }
-        }
-
-        // Создаем кнопки с учетом статусов
-        async function renderUserButtons() {
-            console.log('🎨 Рендерим кнопки пользователей...');
-            
-            let html = '';
-            for (const user of BASE_USERS) {
-                const status = userStatuses.get(user.username) || { isOnline: false, role: 'user', access: 'full' };
-                const isOnline = status.isOnline;
-                const isCurrentUser = currentUser && currentUser.username === user.username;
-                
-                const isDisabled = isOnline && !isCurrentUser;
-                const disabledClass = isDisabled ? 'disabled' : '';
-                const badgeText = isOnline ? '🟢 В сети' : '⚫ Не в сети';
-                const badgeClass = isOnline ? 'online-badge' : 'offline-badge';
-                
-                const roleIcon = user.username === 'Матвей (владелец сайта)' ? ' 👑' : '';
-                
-                html += `
-                    <button class="user-btn ${disabledClass}" data-username="${user.username}" ${isDisabled ? 'disabled' : ''}>
-                        <div class="avatar" style="background: linear-gradient(145deg, ${status.avatarColor1 || '#b38cfa'}, ${status.avatarColor2 || '#9f7aea'}); ${status.avatarUrl ? `background-image: url('${status.avatarUrl}'); background-size: cover;` : ''}">
-                            ${status.avatarUrl ? '' : user.avatar}
-                        </div>
-                        <span>${user.username}${roleIcon}</span>
-                        <span class="${badgeClass}">${badgeText}</span>
-                    </button>
-                `;
-            }
-            
-            // Добавляем заглушку если список пуст
-            if (html === '') {
-                html = '<div style="text-align: center; padding: 20px; color: #8f7aaa;">👥 Пользователи загружаются...</div>';
-            }
-            
-            userButtons.innerHTML = html;
-            console.log('✅ Кнопки отрендерены, количество:', BASE_USERS.length);
-
-            // Добавляем обработчики только на незаблокированные кнопки
-            document.querySelectorAll('.user-btn:not(.disabled)').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const username = btn.dataset.username;
-                    console.log('👆 Выбран пользователь:', username);
-                    loginUser(username);
-                });
-            });
         }
 
         // Автоматическое создание пользователей
@@ -1055,7 +1079,13 @@
         }
 
         // Вход пользователя
-        async function loginUser(username) {
+        async function loginUser() {
+            const username = userSelect.value;
+            if (!username) {
+                showToast('Выберите имя из списка');
+                return;
+            }
+
             try {
                 console.log('🔑 Вход пользователя:', username);
                 
@@ -1670,6 +1700,10 @@
         }
 
         // Обработчики
+        userSelect.addEventListener('change', updateSelectedUserStatus);
+        
+        loginBtn.addEventListener('click', loginUser);
+
         sendButton.addEventListener('click', sendMessage);
         
         messageInput.addEventListener('keypress', (e) => {
