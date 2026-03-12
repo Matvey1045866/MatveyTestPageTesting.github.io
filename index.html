@@ -2,1136 +2,497 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Luau Mobile 3D - Roblox в телефоне</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Для подруг и друзей ✨</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            overflow: hidden;
-            background: #0a0a1a;
-            color: white;
-            position: fixed;
-            width: 100%;
-            height: 100%;
+            background: linear-gradient(145deg, #f0e7fe 0%, #d9d0f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
         }
 
-        /* Основной контейнер */
-        #app {
+        /* каркас мессенджера — как настоящее приложение */
+        .messenger-app {
+            max-width: 420px;
+            width: 100%;
+            height: 780px;
+            background-color: #ffffff;
+            border-radius: 36px;
+            box-shadow: 0 30px 50px rgba(95, 70, 130, 0.25), 0 0 0 2px rgba(255, 255, 255, 0.5) inset;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
             position: relative;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: linear-gradient(135deg, #1a1a2a 0%, #16213e 100%);
         }
 
-        /* 3D вьюпорт на весь экран */
-        #view3d {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
+        /* стильный градиентный хедер */
+        .header {
+            background: linear-gradient(112deg, #b38cfa, #a06cf0);
+            padding: 28px 20px 16px 20px;
+            color: white;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
+            box-shadow: 0 6px 14px rgba(130, 80, 200, 0.35);
         }
 
-        /* Адаптивный HUD */
-        #hud {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
-            z-index: 20;
-            pointer-events: none;
+        .header-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .player-stats {
-            background: rgba(10, 10, 20, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 15px;
-            border: 1px solid rgba(0, 188, 212, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            min-width: 140px;
-            pointer-events: auto;
-        }
-
-        .player-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #00bcd4;
-            margin-bottom: 8px;
-            display: flex;
             align-items: center;
-            gap: 6px;
+            margin-bottom: 12px;
         }
 
-        .health-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 8px 0;
+        .header-top h1 {
+            font-size: 1.9rem;
+            font-weight: 630;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00bcd4, #4a90e2);
-            width: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-
-        /* Джойстик управления */
-        #joystick-container {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            width: 120px;
-            height: 120px;
-            z-index: 30;
-            pointer-events: auto;
-        }
-
-        .joystick-base {
-            width: 100%;
-            height: 100%;
-            background: rgba(30, 30, 40, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 60px;
-            border: 2px solid rgba(0, 188, 212, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .joystick-thumb {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #00bcd4, #4a90e2);
+        .header-top span {
+            background-color: rgba(255,255,255,0.2);
+            backdrop-filter: blur(4px);
+            padding: 6px 12px;
             border-radius: 40px;
-            box-shadow: 0 5px 15px rgba(0,188,212,0.4);
-            transition: transform 0.1s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
         }
 
-        /* Сенсорная панель для взгляда */
-        #look-panel {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50%;
-            height: 100%;
-            z-index: 25;
-            pointer-events: auto;
-            background: transparent;
-            touch-action: none;
-        }
-
-        /* Кнопки действий */
-        .action-buttons {
-            position: absolute;
-            bottom: 30px;
-            right: 20px;
+        .tabs {
             display: flex;
-            gap: 15px;
-            z-index: 30;
-            pointer-events: auto;
+            gap: 8px;
+            margin-top: 4px;
         }
 
-        .action-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 35px;
-            background: rgba(30, 30, 40, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid #00bcd4;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-
-        .action-btn:active {
-            transform: scale(0.9);
-            background: #00bcd4;
-        }
-
-        .action-btn.jump {
-            border-color: #4a90e2;
-            margin-bottom: 10px;
-        }
-
-        /* Нижнее меню */
-        #bottom-menu {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 80px;
-            background: rgba(20, 20, 30, 0.9);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(0, 188, 212, 0.3);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 40;
-            padding: 0 10px;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        #bottom-menu.active {
-            transform: translateY(0);
-        }
-
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            color: #aaa;
-            font-size: 12px;
-            padding: 10px;
-            border-radius: 10px;
-            transition: all 0.2s;
-            touch-action: manipulation;
-        }
-
-        .menu-item.active {
-            color: #00bcd4;
-            background: rgba(0, 188, 212, 0.1);
-        }
-
-        .menu-item i {
-            font-size: 24px;
-        }
-
-        /* Меню создания объектов */
-        #create-menu {
-            position: absolute;
-            bottom: 100px;
-            right: 20px;
-            background: rgba(20, 20, 30, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid #00bcd4;
-            padding: 15px;
-            z-index: 45;
-            display: none;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            min-width: 200px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-        }
-
-        .create-item {
-            padding: 15px 10px;
-            background: #2a2a3a;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 14px;
-            color: white;
-            border: 1px solid #3a3a4a;
-            transition: all 0.2s;
-            touch-action: manipulation;
-        }
-
-        .create-item:active {
-            background: #00bcd4;
-            transform: scale(0.95);
-        }
-
-        /* Эксплорер объектов (свайпаемый) */
-        #explorer-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 85%;
-            max-width: 320px;
-            height: 100%;
-            background: rgba(20, 20, 30, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 50;
-            transform: translateX(-100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border-right: 1px solid #00bcd4;
-            display: flex;
-            flex-direction: column;
-        }
-
-        #explorer-panel.active {
-            transform: translateX(0);
-        }
-
-        .explorer-header {
-            padding: 20px;
-            border-bottom: 1px solid #3a3a4a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .explorer-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #00bcd4;
-        }
-
-        .close-btn {
-            font-size: 24px;
-            color: #aaa;
-            padding: 10px;
-            touch-action: manipulation;
-        }
-
-        #object-tree {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px;
-        }
-
-        .tree-item {
-            padding: 12px 15px;
-            margin: 5px 0;
-            background: #2a2a3a;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 4px solid transparent;
-            touch-action: manipulation;
-        }
-
-        .tree-item.selected {
-            border-left-color: #00bcd4;
-            background: #3a3a4a;
-        }
-
-        .tree-item .icon {
-            font-size: 20px;
-        }
-
-        .tree-item .name {
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .tree-item .type {
-            color: #00bcd4;
-            font-size: 12px;
-        }
-
-        /* Свойства объекта */
-        #properties-panel {
-            background: #1e1e2f;
-            border-radius: 15px 15px 0 0;
-            padding: 15px;
-            margin: 10px;
-            display: none;
-        }
-
-        .property-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .property-label {
-            width: 80px;
-            color: #aaa;
-        }
-
-        .property-value {
-            flex: 1;
-            background: #2a2a3a;
-            border: 1px solid #3a3a4a;
-            border-radius: 8px;
-            padding: 8px 12px;
+        .tab {
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(4px);
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+            cursor: default; /* не интерактивно, просто дизайн */
             color: white;
         }
 
-        /* Редактор кода */
-        #code-editor {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a2a;
-            z-index: 60;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            flex-direction: column;
+        .tab.active {
+            background: white;
+            color: #7c52c2;
+            border-color: transparent;
         }
 
-        #code-editor.active {
-            transform: translateX(0);
-        }
-
-        .editor-header {
-            padding: 20px;
-            background: #2a2a3a;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #code-input {
-            flex: 1;
-            background: #1e1e2f;
-            border: none;
-            color: #d4d4d4;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            padding: 20px;
-            resize: none;
-            outline: none;
-            white-space: pre;
-            overflow: auto;
-        }
-
-        #mobile-output {
-            height: 120px;
-            background: #0a0a1a;
-            border-top: 1px solid #00bcd4;
-            padding: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #b0f0b0;
-            overflow-y: auto;
-        }
-
-        /* Индикатор режима */
-        #mode-indicator {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            padding: 8px 16px;
+        /* поиск (милый, просто для красоты) */
+        .search-box {
+            background-color: #f4f0fc;
+            margin: 16px 16px 12px 16px;
+            padding: 12px 18px;
             border-radius: 30px;
-            border: 1px solid #00bcd4;
-            color: #00bcd4;
-            font-size: 14px;
-            z-index: 15;
             display: flex;
             align-items: center;
             gap: 8px;
+            color: #b7a4d4;
+            font-weight: 500;
+            border: 1px solid #e5daf5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
         }
 
-        /* Анимации */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .search-box::before {
+            content: "🔍";
+            margin-right: 6px;
+            opacity: 0.7;
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        .search-box span {
+            color: #9b89b5;
         }
 
-        /* Touch-оптимизация */
-        @media (max-width: 768px) {
-            .action-btn {
-                width: 60px;
-                height: 60px;
-                font-size: 20px;
-            }
-            
-            #joystick-container {
-                width: 100px;
-                height: 100px;
-                bottom: 20px;
-                left: 20px;
-            }
-            
-            .joystick-thumb {
-                width: 40px;
-                height: 40px;
-            }
+        /* список чатов (основной контент) */
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 12px 8px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: #cbb5f0 #f7f2ff;
         }
+
+        .chats-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .chats-list::-webkit-scrollbar-track {
+            background: #f7f2ff;
+        }
+        .chats-list::-webkit-scrollbar-thumb {
+            background: #cbb5f0;
+            border-radius: 10px;
+        }
+
+        /* карточка чата */
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 16px;
+            background: #faf7ff;
+            border-radius: 28px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .chat-item:hover {
+            background: #f2ebff;
+            border-color: #dac7ff;
+            transform: scale(1.01);
+            cursor: default;
+        }
+
+        /* аватарки с фоном под инициалы */
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #cea9ff, #b27afc);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 12px rgba(164, 116, 232, 0.3);
+            flex-shrink: 0;
+            text-transform: uppercase;
+        }
+
+        /* разные оттенки для разнообразия */
+        .chat-item:nth-child(1) .avatar { background: linear-gradient(145deg, #fa9e9e, #f36885); }
+        .chat-item:nth-child(2) .avatar { background: linear-gradient(145deg, #89d4cf, #6ab3f2); }
+        .chat-item:nth-child(3) .avatar { background: linear-gradient(145deg, #fdaf8b, #fd6e8b); }
+        .chat-item:nth-child(4) .avatar { background: linear-gradient(145deg, #bf95f9, #9d6cf5); }
+        .chat-item:nth-child(5) .avatar { background: linear-gradient(145deg, #fbbb7b, #fa8c5f); }
+        .chat-item:nth-child(6) .avatar { background: linear-gradient(145deg, #9ad5a0, #57bb8a); }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .line1 {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .friend-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #29213b;
+            letter-spacing: -0.2px;
+        }
+
+        .time {
+            font-size: 0.75rem;
+            color: #a28fc0;
+            font-weight: 500;
+            background: #eee5ff;
+            padding: 3px 9px;
+            border-radius: 40px;
+        }
+
+        .last-message {
+            color: #6e5a8a;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 210px;
+        }
+
+        .badge {
+            background-color: #eb4d8c;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 22px;
+            height: 22px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            box-shadow: 0 3px 7px rgba(235, 77, 140, 0.3);
+        }
+
+        /* панель ввода сообщения (стилизована под "напиши подруге") */
+        .message-input-area {
+            background: white;
+            padding: 18px 20px 20px 20px;
+            border-top: 2px solid #f0e6ff;
+            box-shadow: 0 -4px 12px rgba(183, 148, 244, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .plus-button {
+            background: #f3ebff;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #906fcf;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.03);
+            cursor: default;
+            transition: 0.2s;
+            border: 1px solid #e0d0f5;
+        }
+
+        .fake-input {
+            flex: 1;
+            background: #f7f2fe;
+            padding: 14px 22px;
+            border-radius: 50px;
+            color: #836eb0;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #e3d5fc;
+            box-shadow: inset 0 2px 5px rgba(175, 140, 220, 0.1);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: default;
+        }
+
+        .fake-input::before {
+            content: "✍️";
+            margin-right: 6px;
+            opacity: 0.8;
+        }
+
+        .send-button {
+            background: #b28cfa;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 14px rgba(151, 107, 224, 0.4);
+            cursor: default;
+            transition: 0.2s;
+        }
+
+        /* маленькое примечание (для github pages — просто красота) */
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #a18fc0;
+            padding: 6px 0 8px 0;
+            background: white;
+            border-top: 1px dashed #decff0;
+        }
+
+        .footer-note span {
+            background: #f2eaff;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- 3D Viewport -->
-        <div id="view3d"></div>
-
-        <!-- Режим индикатор -->
-        <div id="mode-indicator">
-            <span>🎮</span>
-            <span id="mode-text">Режим игры</span>
-        </div>
-
-        <!-- HUD игрока -->
-        <div id="hud">
-            <div class="player-stats">
-                <div class="player-name">
-                    <span>👤</span>
-                    <span id="player-name">Игрок</span>
-                </div>
-                <div class="health-bar">
-                    <div class="health-fill" id="health-fill" style="width: 100%"></div>
-                </div>
-                <div class="stats-row">
-                    <span>❤️ <span id="health-value">100</span></span>
-                    <span>⚡ <span id="speed-value">16</span></span>
-                </div>
+    <div class="messenger-app">
+        <!-- шапка — для подруг и друзей -->
+        <div class="header">
+            <div class="header-top">
+                <h1>⁕ circle</h1>
+                <span>✨ 12 online</span>
+            </div>
+            <div class="tabs">
+                <div class="tab active">Чаты</div>
+                <div class="tab">Подруги</div>
+                <div class="tab">Друзья</div>
             </div>
         </div>
 
-        <!-- Джойстик -->
-        <div id="joystick-container">
-            <div class="joystick-base">
-                <div class="joystick-thumb" id="joystick-thumb"></div>
-            </div>
+        <!-- строка поиска (милая заглушка) -->
+        <div class="search-box">
+            <span>Найти среди своих...  </span>
         </div>
 
-        <!-- Панель взгляда (сенсорная) -->
-        <div id="look-panel"></div>
-
-        <!-- Кнопки действий -->
-        <div class="action-buttons">
-            <div class="action-btn jump" id="jump-btn">🏃</div>
-            <div class="action-btn" id="action-btn">⚡</div>
-        </div>
-
-        <!-- Нижнее меню -->
-        <div id="bottom-menu">
-            <div class="menu-item active" data-menu="game">
-                <i>🎮</i>
-                <span>Игра</span>
-            </div>
-            <div class="menu-item" data-menu="explorer">
-                <i>📁</i>
-                <span>Объекты</span>
-            </div>
-            <div class="menu-item" data-menu="create">
-                <i>➕</i>
-                <span>Создать</span>
-            </div>
-            <div class="menu-item" data-menu="code">
-                <i>📝</i>
-                <span>Код</span>
-            </div>
-        </div>
-
-        <!-- Меню создания объектов -->
-        <div id="create-menu">
-            <div class="create-item" data-type="part">🧱 Блок</div>
-            <div class="create-item" data-type="sphere">⚪ Сфера</div>
-            <div class="create-item" data-type="cylinder">📦 Цилиндр</div>
-            <div class="create-item" data-type="wedge">🔺 Клин</div>
-            <div class="create-item" data-type="light">💡 Свет</div>
-            <div class="create-item" data-type="spawn">📍 Спавн</div>
-        </div>
-
-        <!-- Эксплорер объектов -->
-        <div id="explorer-panel">
-            <div class="explorer-header">
-                <span class="explorer-title">📁 Эксплорер</span>
-                <span class="close-btn" id="close-explorer">✕</span>
-            </div>
-            <div id="object-tree">
-                <!-- Динамически заполняется -->
-            </div>
-            <div id="properties-panel">
-                <h4 style="color: #00bcd4; margin-bottom: 10px;">Свойства</h4>
-                <div class="property-row">
-                    <span class="property-label">Имя</span>
-                    <div class="property-value" id="prop-name">Object</div>
-                </div>
-                <div class="property-row">
-                    <span class="property-label">Позиция</span>
-                    <div class="property-value" id="prop-pos">0,0,0</div>
-                </div>
-                <div class="property-row">
-                    <span class="property-label">Цвет</span>
-                    <div class="property-value" id="prop-color">#00bcd4</div>
+        <!-- список чатов (и подруги, и друзья вместе) -->
+        <div class="chats-list">
+            <!-- Чат 1: лучшая подруга -->
+            <div class="chat-item">
+                <div class="avatar">АЛ</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Алиса</span>
+                        <span class="time">10:45</span>
+                    </div>
+                    <div class="last-message">
+                        <span>⚡ Голосовое 0:23</span>
+                        <span class="badge">2</span>
+                    </div>
                 </div>
             </div>
+
+            <!-- Чат 2: подруга и друг в одном лице -->
+            <div class="chat-item">
+                <div class="avatar">МК</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Миша + Катя</span>
+                        <span class="time">09:12</span>
+                    </div>
+                    <div class="last-message">
+                        <span>👥 Катя: «сегодня в 7?»</span>
+                        <span class="badge">5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Чат 3: для подруги -->
+            <div class="chat-item">
+                <div class="avatar">СО</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Соня</span>
+                        <span class="time">вчера</span>
+                    </div>
+                    <div class="last-message">
+                        <span>📸 Фото: закат</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Чат 4: друг детства -->
+            <div class="chat-item">
+                <div class="avatar">ДН</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Денис</span>
+                        <span class="time">вчера</span>
+                    </div>
+                    <div class="last-message">
+                        <span>🎮 Скинь дс</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Чат 5: лучший друг -->
+            <div class="chat-item">
+                <div class="avatar">ИЛ</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Илья</span>
+                        <span class="time">16:20</span>
+                    </div>
+                    <div class="last-message">
+                        <span>😄 го в кино?</span>
+                        <span class="badge">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Чат 6: две подруги (общий чат) -->
+            <div class="chat-item">
+                <div class="avatar">ВИ</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Віка + Іра</span>
+                        <span class="time">11:05</span>
+                    </div>
+                    <div class="last-message">
+                        <span>❤️ Ира: как платье?</span>
+                        <span class="badge">3</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ещё подруга -->
+            <div class="chat-item">
+                <div class="avatar">НС</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Настя</span>
+                        <span class="time">08:30</span>
+                    </div>
+                    <div class="last-message">
+                        <span>☕ Давай сегодня встретимся</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Друг с гитарой -->
+            <div class="chat-item">
+                <div class="avatar">ГЛ</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Глеб</span>
+                        <span class="time">вчера</span>
+                    </div>
+                    <div class="last-message">
+                        <span>🎸 скинь бой</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Подруга из универа -->
+            <div class="chat-item">
+                <div class="avatar">ПН</div>
+                <div class="chat-info">
+                    <div class="line1">
+                        <span class="friend-name">Полина</span>
+                        <span class="time">12:48</span>
+                    </div>
+                    <div class="last-message">
+                        <span>📚 конспекты готовы)</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Редактор кода -->
-        <div id="code-editor">
-            <div class="editor-header">
-                <span style="color: #00bcd4; font-weight: bold;">📝 Luau Editor</span>
-                <span class="close-btn" id="close-editor">✕</span>
-            </div>
-            <textarea id="code-input" placeholder="-- Напишите Luau скрипт
-local part = Instance.new('Part')
-part.Name = 'MobileBlock'
-part.Color = Color3.new(0, 1, 1)
-part.Position = Vector3.new(0, 5, 0)
-part.Size = Vector3.new(2, 2, 2)
-part.Anchored = true
+        <!-- поле "ввода" (декоративное) -->
+        <div class="message-input-area">
+            <div class="plus-button">+</div>
+            <div class="fake-input">написать подруге...</div>
+            <div class="send-button">➤</div>
+        </div>
 
-print('Блок создан!')"></textarea>
-            <div id="mobile-output"></div>
-            <div style="display: flex; gap: 10px; padding: 10px;">
-                <button id="mobile-run" style="flex: 1; background: #00bcd4; border: none; padding: 15px; border-radius: 10px; color: white; font-weight: bold;">Запустить</button>
-                <button id="mobile-clear" style="flex: 1; background: #f44336; border: none; padding: 15px; border-radius: 10px; color: white;">Очистить</button>
-            </div>
+        <!-- маленький футер с настроением -->
+        <div class="footer-note">
+            <span>💬 для подруг и друзей · github pages</span>
         </div>
     </div>
 
-    <!-- Подключаем Three.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
-            }
-        }
-    </script>
-
-    <script type="module">
-        import * as THREE from 'three';
-
-        // --- Инициализация Three.js ---
-        const container = document.getElementById('view3d');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a1a);
-        scene.fog = new THREE.Fog(0x0a0a1a, 10, 50);
-
-        // Камера от первого лица
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 2, 5);
-
-        // Рендерер
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
-
-        // --- Освещение ---
-        // Окружающий свет
-        const ambientLight = new THREE.AmbientLight(0x404060);
-        scene.add(ambientLight);
-
-        // Солнце
-        const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        sunLight.position.set(10, 20, 5);
-        sunLight.castShadow = true;
-        sunLight.receiveShadow = true;
-        sunLight.shadow.mapSize.width = 1024;
-        sunLight.shadow.mapSize.height = 1024;
-        sunLight.shadow.camera.near = 0.5;
-        sunLight.shadow.camera.far = 50;
-        sunLight.shadow.camera.left = -20;
-        sunLight.shadow.camera.right = 20;
-        sunLight.shadow.camera.top = 20;
-        sunLight.shadow.camera.bottom = -20;
-        scene.add(sunLight);
-
-        // Подсветка
-        const fillLight = new THREE.PointLight(0x4466aa, 0.5);
-        fillLight.position.set(-5, 5, 10);
-        scene.add(fillLight);
-
-        // --- Окружение ---
-        // Земля
-        const groundGeometry = new THREE.CircleGeometry(30, 32);
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x1a2a3a, roughness: 0.8, metalness: 0.2 });
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = 0;
-        ground.receiveShadow = true;
-        scene.add(ground);
-
-        // Сетка
-        const gridHelper = new THREE.GridHelper(60, 40, 0x00bcd4, 0x336688);
-        gridHelper.position.y = 0.01;
-        scene.add(gridHelper);
-
-        // Небо (куб с текстурой)
-        const skyGeometry = new THREE.SphereGeometry(100, 32, 16);
-        const skyMaterial = new THREE.MeshBasicMaterial({ color: 0x0a1a2a, side: THREE.BackSide });
-        const sky = new THREE.Mesh(skyGeometry, skyMaterial);
-        scene.add(sky);
-
-        // Звезды (для атмосферы)
-        const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 1000;
-        const starPositions = new Float32Array(starsCount * 3);
-        for (let i = 0; i < starsCount * 3; i += 3) {
-            const r = 80 + Math.random() * 20;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.random() * Math.PI * 2;
-            starPositions[i] = r * Math.sin(theta) * Math.cos(phi);
-            starPositions[i + 1] = r * Math.sin(theta) * Math.sin(phi);
-            starPositions[i + 2] = r * Math.cos(theta);
-        }
-        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.2 });
-        const stars = new THREE.Points(starsGeometry, starsMaterial);
-        scene.add(stars);
-
-        // --- Состояние игры ---
-        const objects = new Map();
-        let nextId = 1;
-        let selectedObject = null;
-
-        // Игрок
-        const player = {
-            mesh: null,
-            health: 100,
-            speed: 16,
-            position: new THREE.Vector3(0, 2, 0),
-            velocity: new THREE.Vector3(0, 0, 0),
-            onGround: true,
-            yaw: 0,
-            pitch: 0
-        };
-
-        // Создаем модель игрока (невидимая, но для коллизий)
-        const playerBody = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.5, 0.5, 1.8, 8),
-            new THREE.MeshStandardMaterial({ color: 0x00bcd4, transparent: true, opacity: 0 })
-        );
-        playerBody.position.copy(player.position);
-        playerBody.position.y += 0.9;
-        scene.add(playerBody);
-        player.mesh = playerBody;
-
-        // --- Управление ---
-        const touchState = {
-            joystick: { active: false, startX: 0, startY: 0, currentX: 0, currentY: 0, strength: 0, angle: 0 },
-            look: { active: false, lastX: 0, lastY: 0 },
-            jump: false,
-            action: false
-        };
-
-        // Джойстик
-        const joystickBase = document.querySelector('.joystick-base');
-        const joystickThumb = document.getElementById('joystick-thumb');
-        const joystickContainer = document.getElementById('joystick-container');
-
-        joystickContainer.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = joystickBase.getBoundingClientRect();
-            touchState.joystick.active = true;
-            touchState.joystick.startX = rect.left + rect.width / 2;
-            touchState.joystick.startY = rect.top + rect.height / 2;
-        });
-
-        joystickContainer.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!touchState.joystick.active) return;
-            
-            const touch = e.touches[0];
-            const dx = touch.clientX - touchState.joystick.startX;
-            const dy = touch.clientY - touchState.joystick.startY;
-            
-            const distance = Math.min(Math.sqrt(dx*dx + dy*dy), 40);
-            const angle = Math.atan2(dy, dx);
-            
-            touchState.joystick.currentX = Math.cos(angle) * distance;
-            touchState.joystick.currentY = Math.sin(angle) * distance;
-            touchState.joystick.strength = distance / 40;
-            touchState.joystick.angle = angle;
-            
-            joystickThumb.style.transform = `translate(${touchState.joystick.currentX}px, ${touchState.joystick.currentY}px)`;
-        });
-
-        joystickContainer.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            touchState.joystick.active = false;
-            touchState.joystick.currentX = 0;
-            touchState.joystick.currentY = 0;
-            touchState.joystick.strength = 0;
-            joystickThumb.style.transform = 'translate(0px, 0px)';
-        });
-
-        // Панель взгляда
-        const lookPanel = document.getElementById('look-panel');
-        lookPanel.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            touchState.look.active = true;
-            touchState.look.lastX = touch.clientX;
-            touchState.look.lastY = touch.clientY;
-        });
-
-        lookPanel.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!touchState.look.active) return;
-            
-            const touch = e.touches[0];
-            const dx = touch.clientX - touchState.look.lastX;
-            const dy = touch.clientY - touchState.look.lastY;
-            
-            // Поворачиваем камеру
-            player.yaw -= dx * 0.01;
-            player.pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/2.5, player.pitch - dy * 0.01));
-            
-            touchState.look.lastX = touch.clientX;
-            touchState.look.lastY = touch.clientY;
-        });
-
-        lookPanel.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            touchState.look.active = false;
-        });
-
-        // Кнопки действий
-        document.getElementById('jump-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            touchState.jump = true;
-        });
-
-        document.getElementById('action-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            touchState.action = true;
-        });
-
-        // --- Функции для создания объектов ---
-        class Instance {
-            constructor(className) {
-                this.className = className;
-                this.Name = className;
-                this.Position = new THREE.Vector3(0, 0, 0);
-                this.Size = new THREE.Vector3(1, 1, 1);
-                this.Color = { r: 0.5, g: 0.5, b: 0.5 };
-                this.Shape = "Block";
-                this.Anchored = false;
-            }
-
-            static new(className) {
-                return new Instance(className);
-            }
-        }
-
-        function create3DObject(instance) {
-            let geometry;
-            let color = new THREE.Color(instance.Color.r, instance.Color.g, instance.Color.b);
-            
-            switch(instance.Shape) {
-                case "Ball":
-                case "Sphere":
-                    geometry = new THREE.SphereGeometry(instance.Size.x/2, 32, 16);
-                    break;
-                case "Cylinder":
-                    geometry = new THREE.CylinderGeometry(instance.Size.x/2, instance.Size.x/2, instance.Size.y, 32);
-                    break;
-                case "Wedge":
-                    geometry = new THREE.ConeGeometry(instance.Size.x/2, instance.Size.y, 4);
-                    break;
-                default:
-                    geometry = new THREE.BoxGeometry(instance.Size.x, instance.Size.y, instance.Size.z);
-            }
-            
-            const material = new THREE.MeshStandardMaterial({ 
-                color: color,
-                roughness: 0.4,
-                metalness: 0.1,
-                emissive: new THREE.Color(0x000000)
-            });
-            
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-            mesh.position.copy(instance.Position);
-            
-            // Добавляем обводку
-            const edges = new THREE.EdgesGeometry(geometry);
-            const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x00bcd4 }));
-            mesh.add(line);
-            
-            return mesh;
-        }
-
-        // --- Обновление дерева объектов ---
-        function updateObjectTree() {
-            const tree = document.getElementById('object-tree');
-            tree.innerHTML = '';
-            
-            objects.forEach((obj, id) => {
-                const item = document.createElement('div');
-                item.className = `tree-item ${selectedObject === id ? 'selected' : ''}`;
-                item.dataset.id = id;
-                
-                let icon = '🧱';
-                if (obj.instance.Shape === 'Sphere') icon = '⚪';
-                else if (obj.instance.Shape === 'Cylinder') icon = '📦';
-                else if (obj.instance.Shape === 'Wedge') icon = '🔺';
-                
-                item.innerHTML = `
-                    <span class="icon">${icon}</span>
-                    <span class="name">${obj.instance.Name}</span>
-                    <span class="type">${obj.instance.Shape}</span>
-                `;
-                
-                item.addEventListener('touchstart', () => {
-                    selectedObject = id;
-                    updateObjectTree();
-                    showProperties(obj.instance);
-                });
-                
-                tree.appendChild(item);
-            });
-        }
-
-        function showProperties(instance) {
-            document.getElementById('prop-name').textContent = instance.Name;
-            document.getElementById('prop-pos').textContent = 
-                `${instance.Position.x.toFixed(1)}, ${instance.Position.y.toFixed(1)}, ${instance.Position.z.toFixed(1)}`;
-            document.getElementById('prop-color').textContent = 
-                `rgb(${Math.round(instance.Color.r*255)}, ${Math.round(instance.Color.g*255)}, ${Math.round(instance.Color.b*255)})`;
-        }
-
-        // --- Мобильный print ---
-        function mobilePrint(...args) {
-            const output = document.getElementById('mobile-output');
-            const text = args.map(String).join(' ');
-            const line = document.createElement('div');
-            line.textContent = text;
-            line.style.margin = '2px 0';
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
-
-        // --- Запуск Luau скрипта ---
-        function runMobileScript(code) {
-            mobilePrint('> Запуск скрипта...');
-            
-            const print = mobilePrint;
-            
-            class Color3 {
-                constructor(r,g,b) { this.r=r; this.g=g; this.b=b; }
-                static new(r,g,b) { return new Color3(r,g,b); }
-            }
-            
-            class Vector3 {
-                constructor(x,y,z) { this.x=x||0; this.y=y||0; this.z=z||0; }
-                static new(x,y,z) { return new Vector3(x,y,z); }
-            }
-            
-            try {
-                const func = new Function('print', 'Instance', 'Color3', 'Vector3', code);
-                func(print, Instance, Color3, Vector3);
-                mobilePrint('✅ Скрипт выполнен');
-            } catch(e) {
-                mobilePrint('❌ Ошибка: ' + e.message);
-            }
-        }
-
-        // --- Меню навигация ---
-        const bottomMenu = document.getElementById('bottom-menu');
-        const explorerPanel = document.getElementById('explorer-panel');
-        const codeEditor = document.getElementById('code-editor');
-        const createMenu = document.getElementById('create-menu');
-
-        document.querySelectorAll('.menu-item').forEach(item => {
-            item.addEventListener('touchstart', () => {
-                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                
-                const menu = item.dataset.menu;
-                
-                // Скрываем все
-                explorerPanel.classList.remove('active');
-                codeEditor.classList.remove('active');
-                createMenu.style.display = 'none';
-                
-                switch(menu) {
-                    case 'explorer':
-                        explorerPanel.classList.add('active');
-                        break;
-                    case 'code':
-                        codeEditor.classList.add('active');
-                        break;
-                    case 'create':
-                        createMenu.style.display = 'grid';
-                        setTimeout(() => {
-                            createMenu.style.display = 'none';
-                        }, 5000);
-                        break;
-                }
-            });
-        });
-
-        // Закрытие панелей
-        document.getElementById('close-explorer').addEventListener('touchstart', () => {
-            explorerPanel.classList.remove('active');
-        });
-
-        document.getElementById('close-editor').addEventListener('touchstart', () => {
-            codeEditor.classList.remove('active');
-        });
-
-        // Создание объектов из меню
-        document.querySelectorAll('.create-item').forEach(btn => {
-            btn.addEventListener('touchstart', () => {
-                const type = btn.dataset.type;
-                const instance = new Instance('Part');
-                instance.Name = type.charAt(0).toUpperCase() + type.slice(1);
-                instance.Position.set(
-                    player.position.x + Math.sin(player.yaw) * 3,
-                    player.position.y + 1,
-                    player.position.z + Math.cos(player.yaw) * 3
-                );
-                
-                if (type === 'sphere') instance.Shape = 'Sphere';
-                else if (type === 'cylinder') instance.Shape = 'Cylinder';
-                else if (type === 'wedge') instance.Shape = 'Wedge';
-                
-                if (type === 'light') {
-                    instance.Color = { r: 1, g: 1, b: 0.8 };
-                }
-                
-                const mesh = create3DObject(instance);
-                scene.add(mesh);
-                
-                const id = nextId++;
-                objects.set(id, { mesh, instance });
-                
-                updateObjectTree();
-                mobilePrint(`Создан объект: ${instance.Name}`);
-                createMenu.style.display = 'none';
-            });
-        });
-
-        // Запуск скрипта
-        document.getElementById('mobile-run').addEventListener('touchstart', () => {
-            const code = document.getElementById('code-input').value;
-            runMobileScript(code);
-        });
-
-        document.getElementById('mobile-clear').addEventListener('touchstart', () => {
-            document.getElementById('mobile-output').innerHTML = '';
-        });
-
-        // --- Анимация и физика ---
-        let lastTime = performance.now();
-        
-        function animate() {
-            const now = performance.now();
-            const delta = Math.min(16, now - lastTime) / 1000; // Ограничиваем до 60fps
-            
-            // Обновление позиции игрока на основе джойстика
-            if (touchState.joystick.strength > 0.1) {
-                const speed = player.speed * touchState.joystick.strength * delta;
-                
-                // Движение относительно направления камеры
-                const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(0, player.yaw, 0));
-                const right = new THREE.Vector3(1, 0, 0).applyEuler(new THREE.Euler(0, player.yaw, 0));
-                
-                const moveX = Math.cos(touchState.joystick.angle) * speed;
-                const moveZ = Math.sin(touchState.joystick.angle) * speed;
-                
-                player.position.x += forward.x * moveZ + right.x * moveX;
-                player.position.z += forward.z * moveZ + right.z * moveX;
-            }
-            
-            // Прыжок
-            if (touchState.jump && player.onGround) {
-                player.velocity.y = 5;
-                player.onGround = false;
-                touchState.jump = false;
-            }
-            
-            // Гравитация
-            player.velocity.y -= 9.8 * delta;
-            player.position.y += player.velocity.y * delta;
-            
-            // Простая коллизия с землей
-            if (player.position.y < 1) {
-                player.position.y = 1;
-                player.velocity.y = 0;
-                player.onGround = true;
-            }
-            
-            // Обновление позиции камеры
-            camera.position.copy(player.position);
-            camera.position.y += 1.6; // Высота глаз
-            
-            // Поворот камеры
-            camera.rotation.order = 'YXZ';
-            camera.rotation.y = player.yaw;
-            camera.rotation.x = player.pitch;
-            
-            // Обновление позиции тела игрока (для коллизий)
-            player.mesh.position.copy(player.position);
-            player.mesh.position.y += 0.9;
-            
-            // Рендер
-            renderer.render(scene, camera);
-            
-            lastTime = now;
-            requestAnimationFrame(animate);
-        }
-        
-        animate();
-
-        // --- Обработка ресайза ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Инициализация стартовых объектов
-        setTimeout(() => {
-            // Добавляем несколько объектов для демонстрации
-            const demoObjects = [
-                { name: 'Platform', pos: [0, 0.5, 2], size: [3, 0.5, 3], color: [0.3, 0.5, 0.8] },
-                { name: 'Tower', pos: [2, 1.5, -2], size: [0.8, 3, 0.8], color: [0.8, 0.5, 0.2] },
-                { name: 'Sphere', pos: [-2, 1, -1], size: [1.5, 1.5, 1.5], color: [0.9, 0.2, 0.3], shape: 'Sphere' }
-            ];
-            
-            demoObjects.forEach(data => {
-                const instance = new Instance('Part');
-                instance.Name = data.name;
-                instance.Position.set(...data.pos);
-                instance.Size.set(...data.size);
-                instance.Color = { r: data.color[0], g: data.color[1], b: data.color[2] };
-                if (data.shape) instance.Shape = data.shape;
-                
-                const mesh = create3DObject(instance);
-                scene.add(mesh);
-                
-                const id = nextId++;
-                objects.set(id, { mesh, instance });
-            });
-            
-            updateObjectTree();
-            mobilePrint('🌟 Добро пожаловать в Luau Mobile 3D!');
-        }, 1000);
-    </script>
+    <!-- совсем маленький дисклеймер: это только фронтенд, но выглядит как настоящий мессенджер -->
+    <!-- иконки и эмодзи везде для уюта -->
 </body>
 </html>
