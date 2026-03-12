@@ -304,6 +304,7 @@
             margin-bottom: 16px;
             transition: 0.2s;
             border: 2px solid transparent;
+            display: none;
         }
 
         .add-user-btn:hover {
@@ -732,6 +733,7 @@
             <h3>ЧатGЧат</h3>
             <div class="user-buttons" id="userButtons">
                 <!-- кнопки будут сгенерированы динамически -->
+                <div style="text-align: center; padding: 20px; color: #8f7aaa;">👥 Загрузка пользователей...</div>
             </div>
             <p style="text-align: center; color: #8f7aaa; font-size: 0.9rem;">Выбери своё имя чтобы войти</p>
         </div>
@@ -749,7 +751,7 @@
         </div>
     </div>
 
-    <!-- модалка создания/редактирования пользователя (только для админа) -->
+    <!-- модалка создания/редактирования пользователя -->
     <div class="user-modal" id="userModal">
         <div class="modal-content">
             <h3 id="userModalTitle">Создание пользователя</h3>
@@ -806,7 +808,7 @@
             <div class="sidebar">
                 <div class="sidebar-header">
                     <button class="create-group-btn" id="showGroupModalBtn">➕ Создать группу</button>
-                    <button class="add-user-btn" id="showAddUserBtn" style="display: none;">👑 Добавить пользователя</button>
+                    <button class="add-user-btn" id="showAddUserBtn">👑 Добавить пользователя</button>
                 </div>
                 <div class="users-list" id="usersList">
                     <!-- список пользователей -->
@@ -946,12 +948,18 @@
         // Проверка кто онлайн
         async function checkOnlineStatuses() {
             try {
+                console.log('🔄 Проверяем статусы пользователей...');
                 const { data: users, error } = await supabase
                     .from('users')
                     .select('id, username, is_online, last_seen, role, access, avatar_color1, avatar_color2, avatar_url')
                     .in('username', BASE_USERS.map(u => u.username));
 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Ошибка загрузки статусов:', error);
+                    return;
+                }
+
+                console.log('📊 Получены статусы:', users);
 
                 userStatuses.clear();
                 users.forEach(user => {
@@ -974,8 +982,8 @@
 
         // Создаем кнопки с учетом статусов
         async function renderUserButtons() {
-            await checkOnlineStatuses();
-
+            console.log('🎨 Рендерим кнопки пользователей...');
+            
             let html = '';
             for (const user of BASE_USERS) {
                 const status = userStatuses.get(user.username) || { isOnline: false, role: 'user', access: 'full' };
@@ -999,11 +1007,20 @@
                     </button>
                 `;
             }
+            
+            // Добавляем заглушку если список пуст
+            if (html === '') {
+                html = '<div style="text-align: center; padding: 20px; color: #8f7aaa;">👥 Пользователи загружаются...</div>';
+            }
+            
             userButtons.innerHTML = html;
+            console.log('✅ Кнопки отрендерены, количество:', BASE_USERS.length);
 
+            // Добавляем обработчики только на незаблокированные кнопки
             document.querySelectorAll('.user-btn:not(.disabled)').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const username = btn.dataset.username;
+                    console.log('👆 Выбран пользователь:', username);
                     loginUser(username);
                 });
             });
@@ -1011,6 +1028,7 @@
 
         // Автоматическое создание пользователей
         async function ensureUsersExist() {
+            console.log('🔄 Проверяем существование пользователей...');
             for (const user of BASE_USERS) {
                 const { data: existing } = await supabase
                     .from('users')
@@ -1019,6 +1037,7 @@
                     .maybeSingle();
 
                 if (!existing) {
+                    console.log('➕ Создаем пользователя:', user.username);
                     await supabase
                         .from('users')
                         .insert([{ 
@@ -1032,11 +1051,14 @@
                         }]);
                 }
             }
+            console.log('✅ Проверка пользователей завершена');
         }
 
         // Вход пользователя
         async function loginUser(username) {
             try {
+                console.log('🔑 Вход пользователя:', username);
+                
                 const { data: existingUser, error: checkError } = await supabase
                     .from('users')
                     .select('*')
@@ -1047,7 +1069,7 @@
 
                 if (existingUser && existingUser.is_online) {
                     showToast(`❌ ${username} уже в сети!`);
-                    await renderUserButtons();
+                    await checkOnlineStatuses();
                     return;
                 }
 
@@ -1368,7 +1390,7 @@
                         if (currentUser && payload.new.id !== currentUser.id) {
                             loadUsersAndGroups();
                         }
-                        renderUserButtons();
+                        checkOnlineStatuses();
                     }
                 )
                 .subscribe();
@@ -1520,7 +1542,7 @@
 
                 userModal.style.display = 'none';
                 loadUsersAndGroups();
-                renderUserButtons();
+                checkOnlineStatuses();
             } catch (error) {
                 console.error('Error saving user:', error);
                 showToast('Ошибка сохранения');
@@ -1542,7 +1564,7 @@
                 showToast('Пользователь удален', true);
                 userModal.style.display = 'none';
                 loadUsersAndGroups();
-                renderUserButtons();
+                checkOnlineStatuses();
             } catch (error) {
                 console.error('Error deleting user:', error);
                 showToast('Ошибка удаления');
@@ -1575,8 +1597,9 @@
             
             registerModal.style.display = 'flex';
             messengerApp.classList.remove('visible');
+            showAddUserBtn.style.display = 'none';
             
-            renderUserButtons();
+            await checkOnlineStatuses();
         }
 
         // Escape HTML
@@ -1591,6 +1614,7 @@
 
         // Проверка сессии
         async function checkSession() {
+            console.log('🔄 Проверка сессии...');
             await ensureUsersExist();
             
             const savedUser = localStorage.getItem('chat_user');
@@ -1606,7 +1630,7 @@
                     
                     if (data && data.is_online) {
                         localStorage.removeItem('chat_user');
-                        await renderUserButtons();
+                        await checkOnlineStatuses();
                         registerModal.style.display = 'flex';
                         return;
                     }
@@ -1641,7 +1665,7 @@
                 }
             }
             
-            await renderUserButtons();
+            await checkOnlineStatuses();
             registerModal.style.display = 'flex';
         }
 
@@ -1714,7 +1738,7 @@
         // Периодическая проверка статусов
         setInterval(() => {
             if (!currentUser) {
-                renderUserButtons();
+                checkOnlineStatuses();
             }
         }, 10000);
     </script>
